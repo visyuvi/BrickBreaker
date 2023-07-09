@@ -1,3 +1,5 @@
+import math
+
 import pygame
 
 WIDTH, HEIGHT = 800, 600
@@ -59,11 +61,30 @@ def draw(win, paddle, ball):
 
 def ball_collision(ball):
     if ball.x - BALL_RADIUS <= 0 or ball.x + BALL_RADIUS >= WIDTH:
-        print("inside here")
         ball.set_vel(ball.x_vel * -1, ball.y_vel)
 
     if ball.y + BALL_RADIUS >= HEIGHT or ball.y - BALL_RADIUS <= 0:
         ball.set_vel(ball.x_vel, ball.y_vel * -1)
+
+
+def ball_paddle_collision(ball, paddle):
+    if not (paddle.x + paddle.width >= ball.x >= paddle.x):
+        return
+    if not (ball.y + BALL_RADIUS >= paddle.y):
+        return
+
+    paddle_center = paddle.x + paddle.width // 2
+    print(paddle.x, paddle.width)
+    distance_to_center = ball.x - paddle_center
+
+    percent_width = distance_to_center / paddle.width
+    angle = percent_width * 90
+    angle_radians = math.radians(angle)
+
+    x_vel = math.sin(angle_radians) * ball.VEL
+    y_vel = math.cos(angle_radians) * ball.VEL * -1
+
+    ball.set_vel(x_vel, y_vel)
 
 
 def main():
@@ -92,6 +113,7 @@ def main():
 
         ball.move()
         ball_collision(ball)
+        ball_paddle_collision(ball, paddle)
         draw(win, paddle, ball)
 
     pygame.quit()
